@@ -30,8 +30,13 @@ Interactive HTML reference (Neural Networks · LangGraph · MCP). Open `AI-Onboa
 
 ## Edit the cheatsheet
 
-Change **`AI-Onboarding-Cheatsheet.html`** only. `index.html` is a symlink to that file so the hosted root URL stays in sync.
+GitHub Pages serves **`index.html`** at the site root. **`AI-Onboarding-Cheatsheet.html`** is the same content for a descriptive filename locally.
 
-If you clone on Windows and the symlink breaks, replace `index.html` with a copy:
+After you edit **`AI-Onboarding-Cheatsheet.html`**, sync the copy before pushing:
 
-`cp AI-Onboarding-Cheatsheet.html index.html`
+```bash
+cp AI-Onboarding-Cheatsheet.html index.html
+git add AI-Onboarding-Cheatsheet.html index.html && git commit -m "Update cheatsheet" && git push
+```
+
+The **`.nojekyll`** file disables Jekyll so the large static HTML deploys as-is.
