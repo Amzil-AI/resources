@@ -32,7 +32,13 @@ Interactive HTML reference (Neural Networks · LangGraph · MCP). Open `AI-Onboa
 
 GitHub Pages serves **`index.html`** at the site root. **`AI-Onboarding-Cheatsheet.html`** is the same content for a descriptive filename locally.
 
-After you edit **`AI-Onboarding-Cheatsheet.html`**, sync the copy before pushing:
+After you edit **`AI-Onboarding-Cheatsheet.html`**, run:
+
+```bash
+./sync-pages.sh
+```
+
+That copies to `index.html`, commits if anything changed, and pushes. Or do it manually:
 
 ```bash
 cp AI-Onboarding-Cheatsheet.html index.html
