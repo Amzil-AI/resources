@@ -233,13 +233,6 @@ tr:hover td{background:var(--surface2)}
 .tcard p{font-size:.82rem;color:var(--txt-muted);margin-bottom:.35rem}
 .tcard .lbl{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--txt-dim);text-transform:uppercase;margin-bottom:.3rem;display:block}
 
-/* ── SOURCES ── */
-.sources{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
-.sources h5{font-size:.75rem;color:var(--txt-muted);font-family:'Space Mono',monospace;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.7rem}
-.sources a{display:block;font-size:.78rem;color:var(--txt-muted);text-decoration:none;margin-bottom:.28rem;transition:color .18s}
-.sources a:hover{color:var(--txt)}
-.sources a::before{content:'→ ';color:var(--border2)}
-
 /* ── INLINE CODE ── */
 code{font-family:'Space Mono',monospace;font-size:.78em;background:var(--surface2);padding:.1rem .35rem;border-radius:3px;border:1px solid var(--border);color:var(--lg)}
 
@@ -1088,13 +1081,6 @@ model = nn.<span class="cls">Sequential</span>(
     <div class="glos-item"><div class="term" style="color:var(--nn)">Temperature</div><div class="def">Softmax scaling: high T → uniform; low T → peaked distribution</div></div>
     <div class="glos-item"><div class="term" style="color:var(--nn)">Tokenisation</div><div class="def">Split text into sub-word units. BPE/WordPiece → integer IDs</div></div>
   </div>
-
-  <div class="sources">
-    <h5>// Sources</h5>
-    <a href="https://youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi">3Blue1Brown — Neural Networks (YouTube playlist)</a>
-    <a href="https://youtube.com/playlist?list=PLZoTAELRMXVNAprLfaHq64tBeCGvWSVpv">Krish Naik — ML/AI Fundamentals (YouTube playlist)</a>
-    <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. — Attention Is All You Need (2017)</a>
-  </div>
 </div>
 
 
@@ -1641,14 +1627,6 @@ app.invoke(None, config)</pre>
     <div class="glos-item"><div class="term" style="color:var(--lg)">Sub-graph</div><div class="def">A compiled graph used as a node inside another graph</div></div>
     <div class="glos-item"><div class="term" style="color:var(--lg)">add_messages</div><div class="def">Reducer that appends new messages rather than replacing the list</div></div>
     <div class="glos-item"><div class="term" style="color:var(--lg)">create_react_agent</div><div class="def">Convenience function that builds the full ReAct graph for you</div></div>
-  </div>
-
-  <div class="sources">
-    <h5>// Sources</h5>
-    <a href="https://www.youtube.com/watch?v=HCSPIH3I-vc">Krish Naik — Live Build: Agentic AI Chatbot with LangGraph (YouTube)</a>
-    <a href="https://arxiv.org/abs/2412.03801">arXiv:2412.03801 — Agent AI with LangGraph (Wang & Duan, 2024)</a>
-    <a href="https://langchain-ai.github.io/langgraph/">LangGraph Official Documentation</a>
-    <a href="https://python.langchain.com/docs/concepts/">LangChain Concepts Reference</a>
   </div>
 </div>
 
@@ -2702,15 +2680,6 @@ result = <span class="kw">await</span> agent.ainvoke({
         <li><b>Human-readable rationales</b> — security teams must be able to review and override AI-generated policies</li>
       </ul>
     </div>
-  </div>
-
-  <div class="sources">
-    <h5>// Sources</h5>
-    <a href="https://arxiv.org/abs/2508.18489">arXiv:2508.18489 — MCP for Science & HPC (Pan et al., Aug 2025)</a>
-    <a href="https://arxiv.org/html/2511.20920v1">arXiv:2511.20920 — Securing MCP: Risks, Controls & Governance (Errico, Ngiam, Sojan, Nov 2025)</a>
-    <a href="https://modelcontextprotocol.io/specification">modelcontextprotocol.io — Official MCP Specification (2025-06-18)</a>
-    <a href="https://www.youtube.com/watch?v=HCSPIH3I-vc">Krish Naik — LangGraph + MCP Tutorial (YouTube)</a>
-    <a href="https://github.com/langchain-ai/langchain-mcp-adapters">langchain-mcp-adapters — LangGraph × MCP integration library</a>
   </div>
 </div>
 
