@@ -1,0 +1,189 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{verbatim}
+
+\definecolor{accent}{HTML}{2D6BE8}
+\definecolor{warn}{HTML}{C45C26}
+
+\hypersetup{colorlinks=true, linkcolor=accent, urlcolor=accent}
+
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Vision Desk Solution --- Computer Vision Finance M2 (EN)}
+\cfoot{\thepage}
+
+\title{%
+  \textbf{Solution: Vision Desk}\\[0.35em]
+  \large ViT, JSON and grounded MCP\\[0.5em]
+  \normalsize Computer Vision in Finance --- Master's in Finance, Data \& AI
+}
+\author{Dhiya Lecheheb}
+\date{2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\section{How to read this solution}
+
+This document answers the case \textbf{closed task} with a reference protocol
+and sample traces. Example F1 values are pedagogical; groups may differ.
+Non-negotiable: ViT (not LSTM), JSON schema before test, four MCP tools,
+and no invented claims.
+
+\section{Answer to the closed task (structure)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}p{4.0cm}p{10.6cm}@{}}
+\toprule
+\textbf{Requirement} & \textbf{What a good group shows} \\
+\midrule
+1. Vision assertion & Class + score from \texttt{vision.classify}; fields from \texttt{vision.extract} \\
+2. Tool justification & Each sentence cites a tool call and a JSON field \\
+3. Refusal & If ticker is null / tool KO $\rightarrow$ refuse or retry, never invent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Chosen protocol}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{3.8cm}p{10.8cm}@{}}
+\toprule
+\textbf{Choice} & \textbf{Value} \\
+\midrule
+Input & Page / chart captures, 2--4 classes \\
+Split & By document (80\,\% train / 20\,\% held-out documents) \\
+Model & Pretrained ViT-Small (or Tiny) + fine-tuned head \\
+Baseline & Majority class, or logits on reduced pixels (session~1) \\
+JSON & \texttt{type}, \texttt{confidence}, \texttt{ticker?} (nullable), \texttt{fields} \\
+MCP & \texttt{vision.classify}, \texttt{vision.extract}, \texttt{market.lookup}, \texttt{knowledge.search} \\
+LLM & Asserts a fact only if it appears in a tool JSON \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{JSON schema (contract)}
+
+\begin{verbatim}
+{
+  "type": "candlestick_chart",
+  "confidence": 0.91,
+  "ticker": "AAPL",
+  "fields": {
+    "title": "AAPL daily",
+    "period": "2024"
+  },
+  "source_tool": "vision.extract"
+}
+\end{verbatim}
+
+\texttt{ticker} may be \texttt{null}. Invalid JSON (missing required field)
+is a pipeline failure even if the class is correct.
+
+\section{Vision results (expected order of magnitude)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Model} & \textbf{Macro F1 (held-out)} & \textbf{Reading} \\
+\midrule
+Majority baseline & $\approx$ 0.25--0.40 & Depends on imbalance \\
+Fine-tuned ViT & clearly higher & If layout is stable \\
+ViT on new template & often lower & Expected domain shift \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+{\color{warn}\textbf{Reading.}
+If held-out mixes pages from the same PDF as train, F1 is inflated
+(document leakage). Analogue of random \texttt{train\_test\_split} in Signal Desk.}
+
+\section{Grounded trace (requirement 1 + 2)}
+
+\paragraph{User question.} ``What type of image is this, and which ticker appears?''
+
+\paragraph{Tools.}
+\begin{enumerate}
+  \item \texttt{vision.classify} $\rightarrow$ \texttt{\{class: candlestick\_chart, score: 0.91\}}
+  \item \texttt{vision.extract} $\rightarrow$ JSON above (\texttt{ticker: "AAPL"})
+  \item \texttt{market.lookup("AAPL")} $\rightarrow$ metadata (name, currency) --- stub OK
+  \item \texttt{knowledge.search("candlestick")} $\rightarrow$ short glossary --- stub OK
+\end{enumerate}
+
+\paragraph{Acceptable final answer.}
+``\texttt{vision.classify} labels the image as a candlestick chart (0.91).
+\texttt{vision.extract} returns \texttt{ticker=AAPL}.
+\texttt{market.lookup} confirms Apple Inc.\ metadata.
+I assert no closing price: no price field is present in the JSON.''
+
+\section{Refusal after tool failure (requirement 3)}
+
+\paragraph{Situation.} \texttt{vision.extract} returns \texttt{ticker: null}
+(or \texttt{market.lookup} returns an error).
+
+\paragraph{Acceptable.}
+``I cannot confirm a ticker: extraction returns null.
+I refuse to invent a symbol. Retry with a wider crop / different DPI.''
+
+\paragraph{Unacceptable.}
+``It's clearly Tesla.'' --- no tool source.
+
+\section{Penalized anti-patterns}
+
+\begin{itemize}
+  \item LSTM or Conv1D on the image ``because deep learning'';
+  \item LLM claim without a tool call;
+  \item calling \texttt{vision.*} then ignoring the JSON;
+  \item presenting a RAG glossary as OCR / extraction;
+  \item write tools inside the lab.
+\end{itemize}
+
+\section{Typical limits (copy into the 4-page note)}
+
+\begin{enumerate}
+  \item \textbf{Layout shift} --- new template $\Rightarrow$ F1 drop.
+  \item \textbf{Capture} --- DPI, UI chrome, JPEG compression.
+  \item \textbf{Hallucination} --- the LLM fills what the JSON does not have.
+\end{enumerate}
+
+\section{Link with Signal Desk}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{5.5cm}p{8.5cm}@{}}
+\toprule
+\textbf{Signal Desk} & \textbf{Vision Desk} \\
+\midrule
+OHLCV series + LSTM & Image + ViT \\
+Na\"ive baseline / costs & Class baseline + MCP grounding \\
+Walk-forward & Split by document + held-out templates \\
+Dead signal after costs = OK & Refusal after tool KO = OK \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Video resources}
+
+\begin{itemize}
+  \item \href{https://www.youtube.com/watch?v=eMlx5fFNoYc}{3Blue1Brown --- Attention};
+  \item \href{https://www.youtube.com/watch?v=TrdevFK_am4}{Kilcher --- ViT paper};
+  \item \href{https://www.youtube.com/watch?v=ovB0ddFtzzA}{Vision Transformer in PyTorch};
+  \item \href{https://www.youtube.com/watch?v=CQywdSdi5iA}{MCP --- Anthropic};
+  \item \href{https://www.youtube.com/watch?v=LYfr7qusVSs}{MCP beginners Python}.
+\end{itemize}
+
+\end{document}
